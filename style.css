@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Manrope&family=Poppins&display=swap');
+
+:root {
+  --bg-color: white;
+  --blue: #faa916;
+}
+html {
+  font-family: 'Poppins', sans-serif;
+}
+body {
+  margin: 0;
+  font-size: 2rem;
+  background-color: var(--bg-color);
+}
+
+span {
+  color: #623cea;
+}
+h1 {
+  margin-bottom: 0;
+  color: var(--blue);
+}
+
+p {
+  font-size: 1rem;
+}
+.container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.stats {
+  width: 20%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  font-weight: bold;
+  background-color: #623cea;
+  border-radius: 25px;
+  color: white;
+}
+.display {
+  font-size: 4rem;
+  color: #623cea;
+}
+.keyboard > button {
+  font-family: 'Poppins', sans-serif;
+
+  background-color: #eee;
+  border-radius: 5px;
+  border: none;
+  color: #333;
+  display: inline-block;
+  font-size: 0.85em;
+  line-height: 1;
+  padding: 2px 4px;
+  white-space: nowrap;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.keyboard {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 500px;
+}
+
+.keyboard > .valid {
+  background-color: #faa916;
+  color: #333;
+}
+
+.keyboard > .invalid {
+  color: #eee;
+  background-color: red;
+}
+
+.game-buttons > button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 30px;
+  border: none;
+  padding: 30px;
+  background-color: #623cea;
+  color: white;
+}
