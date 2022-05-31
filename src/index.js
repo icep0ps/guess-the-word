@@ -1,34 +1,39 @@
 import { WORDS } from './words';
 
 const gameLogic = (() => {
-  const word = WORDS[Math.floor(Math.random() * WORDS.length)];
-  const converted = Array.from(word);
+  let word = WORDS[Math.floor(Math.random() * WORDS.length)];
+  let converted = Array.from(word);
 
   const player = {
     userGuess: [],
-    lives: 5,
+    lives: 10,
     score: 0,
   };
 
   function play(letters) {
     let guess = [];
-    Array.from(letters.value).forEach((letter) => {
+    Array.from(letters.getAttribute('data-key')).forEach((letter) => {
       guess.push(letter);
     });
+    console.log(guess);
     guess.forEach((letter) => {
       if (converted.includes(letter)) {
+        //while statement to get 2 or more letters in the word at once
         while (converted.includes(letter)) {
           player.userGuess.splice(converted.indexOf(letter), 1, letter);
           converted.splice(converted.indexOf(letter), 1, '✅');
           letters.setAttribute('class', 'valid');
           player.score += 10;
           displayModule.score();
+          console.log(player.userGuess);
         }
       } else {
         player.lives--;
         displayModule.lives();
         letters.setAttribute('class', 'invalid');
+        console.log(player.userGuess);
       }
+
       displayModule.updateDisplay();
     });
   }
@@ -37,31 +42,45 @@ const gameLogic = (() => {
     play(e.target);
   }
 
-  return { eventHandler, word, player };
+  const resetLogic = () => {
+    word = WORDS[Math.floor(Math.random() * WORDS.length)];
+    converted = Array.from(word);
+    gameLogic.player.userGuess = [];
+    displayModule.wordRandomizer(word);
+  };
+
+  function checkword(e) {
+    eventHandler(e);
+    if (player.userGuess.join('') === word) {
+      resetLogic();
+      displayModule.reset();
+    }
+  }
+
+  function checkLives(e) {
+    if (player.lives > 0) {
+      checkword(e);
+    } else {
+      console.log('you lose');
+    }
+  }
+
+  return { checkLives, word, player };
 })();
 
 const displayModule = (() => {
-  const createDisplay = (() => {
+  const createDisplay = () => {
     const display = document.querySelector('.keyboard');
     const alphabetArray = 'abcdefghijklmnopqrstuvwxyz'.split('');
     alphabetArray.forEach((letter) => {
       const key = document.createElement('button');
-      key.setAttribute('value', letter);
+      key.setAttribute('data-key', letter);
       key.textContent = letter;
       display.append(key);
-      key.addEventListener('click', gameLogic.eventHandler, { once: true });
+      key.addEventListener('click', gameLogic.checkLives, { once: true });
     });
-  })();
-
-  const wordRandomizer = (() => {
-    for (let i = 0; i < gameLogic.word.length; i++) {
-      const choice = ['*', gameLogic.word[i]];
-      let final = choice[Math.floor(Math.random() * choice.length)];
-      gameLogic.player.userGuess.push(final);
-      const display = document.querySelector('.display');
-      display.textContent = gameLogic.player.userGuess.join('');
-    }
-  })();
+  };
+  createDisplay();
 
   function score() {
     const domscore = document.querySelector('.score');
@@ -78,5 +97,30 @@ const displayModule = (() => {
     display.textContent = gameLogic.player.userGuess.join('');
   }
 
-  return { score, lives, updateDisplay };
+  function reset() {
+    console.log('rest');
+    const keys = document.querySelectorAll('[data-key]');
+    keys.forEach((key) => {
+      key.remove();
+      key.removeEventListener('click', gameLogic.checkword, { once: true });
+    });
+    const display = document.querySelector('.display');
+    display.textContent = '';
+
+    createDisplay();
+    displayModule.updateDisplay();
+  }
+
+  const wordRandomizer = (word) => {
+    console.log(word);
+    for (let i = 0; i < word.length; i++) {
+      const choice = ['*', word[i]];
+      let final = choice[Math.floor(Math.random() * choice.length)];
+      gameLogic.player.userGuess.push(final);
+      const display = document.querySelector('.display');
+      display.textContent = gameLogic.player.userGuess.join('');
+    }
+  };
+  wordRandomizer(gameLogic.word);
+  return { score, lives, updateDisplay, createDisplay, wordRandomizer, reset };
 })();
