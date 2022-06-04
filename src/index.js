@@ -15,23 +15,19 @@ const gameLogic = (() => {
     Array.from(letters.getAttribute('data-key')).forEach((letter) => {
       guess.push(letter);
     });
-    console.log(guess);
     guess.forEach((letter) => {
       if (converted.includes(letter)) {
-        //while statement to get 2 or more letters in the word at once
         while (converted.includes(letter)) {
           player.userGuess.splice(converted.indexOf(letter), 1, letter);
           converted.splice(converted.indexOf(letter), 1, '✅');
           letters.setAttribute('class', 'valid');
           player.score += 10;
           displayModule.score();
-          console.log(player.userGuess);
         }
       } else {
         player.lives--;
         displayModule.lives();
         letters.setAttribute('class', 'invalid');
-        console.log(player.userGuess);
       }
 
       displayModule.updateDisplay();
@@ -52,18 +48,45 @@ const gameLogic = (() => {
   function checkword(e) {
     eventHandler(e);
     if (player.userGuess.join('') === word) {
-      resetLogic();
+      setTimeout(resetLogic, 2000);
+      addLives();
       displayModule.reset();
+      displayModule.lives();
     }
+  }
+
+  function skipWord(e) {
+    resetLogic();
+    displayModule.reset();
+  }
+
+  function restartGame(e) {
+    player.lives = 10;
+    player.score = 0;
+    resetLogic();
+    displayModule.reset();
+    displayModule.lives();
+    displayModule.score();
   }
 
   function checkLives(e) {
     if (player.lives > 0) {
       checkword(e);
     } else {
-      console.log('you lose');
+      displayModule.showWord(word);
     }
   }
+
+  function addLives() {
+    if (player.lives < 10) {
+      player.lives++;
+    }
+  }
+
+  const reset = document.querySelector('#resetGame');
+  reset.addEventListener('click', restartGame);
+  const skip = document.querySelector('#skipWord');
+  skip.addEventListener('click', skipWord, { once: true });
 
   return { checkLives, word, player };
 })();
@@ -84,12 +107,12 @@ const displayModule = (() => {
 
   function score() {
     const domscore = document.querySelector('.score');
-    domscore.textContent = `lives: ${gameLogic.player.score}`;
+    domscore.textContent = `Score: ${gameLogic.player.score}`;
   }
 
   function lives() {
     const domlives = document.querySelector('.lives');
-    domlives.textContent = `lives: ${gameLogic.player.lives}`;
+    domlives.textContent = `Lives: ${gameLogic.player.lives}`;
   }
 
   function updateDisplay() {
@@ -121,6 +144,20 @@ const displayModule = (() => {
       display.textContent = gameLogic.player.userGuess.join('');
     }
   };
+
+  function showWord(word) {
+    const display = document.querySelector('.display');
+    display.textContent = word;
+  }
   wordRandomizer(gameLogic.word);
-  return { score, lives, updateDisplay, createDisplay, wordRandomizer, reset };
+
+  return {
+    score,
+    lives,
+    updateDisplay,
+    createDisplay,
+    wordRandomizer,
+    reset,
+    showWord,
+  };
 })();
